@@ -433,6 +433,8 @@
                 if (error) throw error;
 
                 const registroVendas = cloudData.find(d => d.id === 'vendas');
+                const registroEstoque = cloudData.find(d => d.id === 'estoque' || d.id === 'ESTOQUE');
+
                 if (!registroVendas || !registroVendas.data || !Array.isArray(registroVendas.data)) {
                     showAlert("Base de preços/vendas não localizada.", "error");
                     return;
@@ -441,29 +443,42 @@
                 let produtosMap = {};
                 const lojaDoUsuario = usuarioLogado.loja.toUpperCase();
 
-                // Filtra restritivamente apenas os dados da loja do utilizador
+                // 1. Mapeia preços da tabela vendas para a loja do utilizador
                 registroVendas.data.forEach(v => {
                     const clienteVenda = v.cliente ? String(v.cliente).trim().toUpperCase() : '';
                     const nomeProduto = v.produto ? String(v.produto).trim().toUpperCase() : '';
                     const ean = v.ean ? String(v.ean).trim() : '';
                     const precoUnitario = parseFloat(v.vlrUnit || 0);
 
-                    // Validação rigorosa: ignora se não tiver EAN válido
                     if (!ean || ean === '' || ean === '0' || ean.toUpperCase() === 'S/EAN') return;
 
-                    // Valida se pertence à loja exata e contém o termo pesquisado
                     if (clienteVenda === lojaDoUsuario && nomeProduto.includes(termo)) {
-                        // Utiliza o EAN como chave única para evitar duplicações na lista
                         if (!produtosMap[ean]) {
                             produtosMap[ean] = {
                                 produto: v.produto,
                                 categoria: v.categoria || 'GERAL',
                                 ean: ean,
-                                preco: precoUnitario
+                                preco: precoUnitario,
+                                estoque: 0
                             };
                         }
                     }
                 });
+
+                // 2. Mapeia o estoque da loja correspondente e zera se for negativo
+                if (registroEstoque && registroEstoque.data) {
+                    for (let k in registroEstoque.data) {
+                        let item = registroEstoque.data[k];
+                        let itemEan = item.ean ? String(item.ean).trim() : '';
+                        let clienteEstoque = item.cliente ? String(item.cliente).trim().toUpperCase() : '';
+                        
+                        if (produtosMap[itemEan] && clienteEstoque === lojaDoUsuario) {
+                            let qtdEstoque = Number(item.estoque) || 0;
+                            // Se o estoque for negativo, zera (Math.max(0, qtd))
+                            produtosMap[itemEan].estoque = Math.max(0, qtdEstoque);
+                        }
+                    }
+                }
 
                 const listaProdutos = Object.values(produtosMap);
 
@@ -486,7 +501,10 @@
                         <div class="space-y-1">
                             <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">${item.categoria}</span>
                             <h2 class="font-bold text-white text-sm leading-snug">${item.produto}</h2>
-                            <span class="text-[10px] font-mono text-slate-500">EAN: ${item.ean}</span>
+                            <div class="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
+                                <span>EAN: ${item.ean}</span>
+                                <span class="text-amber-400 font-semibold">| Estoque: ${item.estoque}</span>
+                            </div>
                         </div>
                         <div class="text-right">
                             <span class="text-[10px] text-slate-400 block">Preço Venda</span>

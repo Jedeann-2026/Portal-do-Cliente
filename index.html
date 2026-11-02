@@ -146,15 +146,27 @@
                 </button>
             </div>
 
-            <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-xl space-y-2">
-                <label class="block text-xs font-semibold text-slate-300">
-                    <i class="fa-solid fa-magnifying-glass text-amber-400 mr-1"></i> Pesquisar Produto na sua Loja:
-                </label>
-                <div class="flex gap-2">
-                    <input type="text" id="input-search" placeholder="Digite parte do nome..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
-                    <button id="btn-buscar" type="button" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition">
-                        <i class="fa-solid fa-search"></i>
-                    </button>
+            <!-- OPÇÃO DE SELEÇÃO DE CATEGORIA + PESQUISA CONTÉM -->
+            <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-xl space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">
+                        <i class="fa-solid fa-list-check text-amber-400 mr-1"></i> Filtrar por Categoria:
+                    </label>
+                    <select id="select-categoria" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                        <option value="">-- Carregando categorias... --</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">
+                        <i class="fa-solid fa-magnifying-glass text-amber-400 mr-1"></i> Ou Pesquisar Produto (Contém):
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" id="input-search" placeholder="Digite parte do nome ou EAN..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                        <button id="btn-buscar" type="button" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition">
+                            <i class="fa-solid fa-search"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -201,6 +213,7 @@
         const lblLojaNome = document.getElementById('lbl-loja-nome');
         const lblUserNome = document.getElementById('lbl-user-nome');
         const inputSearch = document.getElementById('input-search');
+        const selectCategoria = document.getElementById('select-categoria');
         const btnBuscar = document.getElementById('btn-buscar');
         const resultsContainer = document.getElementById('results-container');
         const statusAlert = document.getElementById('status-alert');
@@ -208,33 +221,37 @@
         let usuarioLogado = null;
 
         // Navegação de Telas
-        btnShowRegister.addEventListener('click', () => {
+        btnShowRegister.addEventListener('click', (e) => {
+            e.preventDefault();
             loginScreen.classList.add('hidden');
             registerScreen.classList.remove('hidden');
             forgotScreen.classList.add('hidden');
             hideAlert();
         });
 
-        btnShowForgot.addEventListener('click', () => {
+        btnShowForgot.addEventListener('click', (e) => {
+            e.preventDefault();
             loginScreen.classList.add('hidden');
             forgotScreen.classList.remove('hidden');
             registerScreen.classList.add('hidden');
             hideAlert();
         });
 
-        btnBackLogin.addEventListener('click', () => {
+        btnBackLogin.addEventListener('click', (e) => {
+            e.preventDefault();
             registerScreen.classList.add('hidden');
             loginScreen.classList.remove('hidden');
             hideAlert();
         });
 
-        btnBackLoginForgot.addEventListener('click', () => {
+        btnBackLoginForgot.addEventListener('click', (e) => {
+            e.preventDefault();
             forgotScreen.classList.add('hidden');
             loginScreen.classList.remove('hidden');
             hideAlert();
         });
 
-        // Redefinir Senha
+        // Redefinir Senha (Apenas manipula o registro id='usuarios')
         formForgot.addEventListener('submit', async (e) => {
             e.preventDefault();
             const usuarioAlvo = forgotUser.value.trim();
@@ -254,7 +271,6 @@
                 }
 
                 let listaUsuarios = registroUsuarios.data;
-
                 const indexUser = listaUsuarios.findIndex(u => 
                     String(u.nome).trim().toUpperCase() === usuarioAlvo.toUpperCase() &&
                     String(u.loja).trim().toUpperCase() === lojaAlvo.toUpperCase()
@@ -288,7 +304,7 @@
             }
         });
 
-        // Cadastrar Novo Utilizador
+        // Cadastrar Novo Utilizador (Preserva os restantes dados da tabela)
         formRegister.addEventListener('submit', async (e) => {
             e.preventDefault();
             const novoNome = regUser.value.trim();
@@ -347,11 +363,16 @@
             }
         });
 
-        // Gerenciar Login
+        // Gerenciar Login (Apenas lê a tabela id='usuarios', sem nunca apagá-la ou alterá-la)
         formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
             const usuarioDigitado = loginUser.value.trim();
             const senhaDigitada = loginPass.value.trim();
+
+            if (!usuarioDigitado || !senhaDigitada) {
+                showAlert("Preencha o utilizador e a senha.", "warning");
+                return;
+            }
 
             showAlert("A autenticar...", "info");
 
@@ -389,14 +410,17 @@
                 lblUserNome.innerText = `Utilizador: ${usuarioLogado.nome}`;
                 resultsContainer.innerHTML = "";
 
+                await carregarCategorias();
+
             } catch (err) {
                 console.error("Erro no login:", err);
-                showAlert("Erro ao conectar com o servidor.", "error");
+                showAlert("Erro ao conectar com o servidor: " + err.message, "error");
             }
         });
 
         // Logout
-        btnLogout.addEventListener('click', () => {
+        btnLogout.addEventListener('click', (e) => {
+            e.preventDefault();
             usuarioLogado = null;
             loginUser.value = "";
             loginPass.value = "";
@@ -407,21 +431,67 @@
             hideAlert();
         });
 
-        // Eventos de Busca
-        btnBuscar.addEventListener('click', executarConsulta);
-        inputSearch.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                executarConsulta();
+        // Carregar Categorias dinamicamente (Apenas lê dados de vendas)
+        async function carregarCategorias() {
+            try {
+                const { data: cloudData, error } = await supabaseClient.from('nexxa_store').select('*');
+                if (error) throw error;
+
+                let categoriasSet = new Set();
+                const registroVendas = cloudData.find(d => d.id === 'vendas');
+                const lojaDoUsuario = usuarioLogado.loja.toUpperCase();
+
+                if (registroVendas && registroVendas.data) {
+                    registroVendas.data.forEach(v => {
+                        const clienteVenda = v.cliente ? String(v.cliente).trim().toUpperCase() : '';
+                        let cat = v.categoria ? String(v.categoria).trim().toUpperCase() : '';
+                        if (clienteVenda === lojaDoUsuario && cat) {
+                            categoriasSet.add(cat);
+                        }
+                    });
+                }
+
+                selectCategoria.innerHTML = '<option value="">-- Escolha uma Categoria --</option>';
+                Array.from(categoriasSet).sort().forEach(cat => {
+                    let opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.innerText = cat;
+                    selectCategoria.appendChild(opt);
+                });
+
+            } catch (err) {
+                console.error("Erro ao carregar categorias:", err);
+            }
+        }
+
+        // Eventos de Busca e Filtro por Categoria
+        btnBuscar.addEventListener('click', (e) => {
+            e.preventDefault();
+            selectCategoria.value = ""; 
+            executarConsulta(inputSearch.value.trim().toUpperCase(), '');
+        });
+
+        selectCategoria.addEventListener('change', () => {
+            const catSelecionada = selectCategoria.value;
+            if (catSelecionada) {
+                inputSearch.value = ""; 
+                executarConsulta('', catSelecionada);
             }
         });
 
-        async function executarConsulta() {
-            if (!usuarioLogado) return;
-            const termo = inputSearch.value.trim().toUpperCase();
+        inputSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                selectCategoria.value = ""; 
+                executarConsulta(inputSearch.value.trim().toUpperCase(), '');
+            }
+        });
 
-            if (!termo) {
-                showAlert("Digite parte do nome do produto para pesquisar.", "warning");
+        async function executarConsulta(termo, categoriaFiltro) {
+            if (!usuarioLogado) return;
+
+            if (!termo && !categoriaFiltro) {
+                showAlert("Selecione uma categoria ou digite um termo para pesquisar.", "warning");
                 return;
             }
 
@@ -443,29 +513,42 @@
                 let produtosMap = {};
                 const lojaDoUsuario = usuarioLogado.loja.toUpperCase();
 
-                // 1. Mapeia preços da tabela vendas para a loja do utilizador
+                // 1. Mapeia dados da tabela vendas para a loja do utilizador
                 registroVendas.data.forEach(v => {
                     const clienteVenda = v.cliente ? String(v.cliente).trim().toUpperCase() : '';
                     const nomeProduto = v.produto ? String(v.produto).trim().toUpperCase() : '';
+                    const catProduto = v.categoria ? String(v.categoria).trim().toUpperCase() : 'GERAL';
                     const ean = v.ean ? String(v.ean).trim() : '';
                     const precoUnitario = parseFloat(v.vlrUnit || 0);
 
+                    // Filtro rigoroso: ignora se não tiver EAN válido
                     if (!ean || ean === '' || ean === '0' || ean.toUpperCase() === 'S/EAN') return;
 
-                    if (clienteVenda === lojaDoUsuario && nomeProduto.includes(termo)) {
-                        if (!produtosMap[ean]) {
-                            produtosMap[ean] = {
-                                produto: v.produto,
-                                categoria: v.categoria || 'GERAL',
-                                ean: ean,
-                                preco: precoUnitario,
-                                estoque: 0
-                            };
+                    if (clienteVenda === lojaDoUsuario) {
+                        let atendeFiltro = false;
+                        
+                        if (categoriaFiltro) {
+                            if (catProduto === categoriaFiltro) atendeFiltro = true;
+                        } else if (termo) {
+                            // Busca por aproximação (contém) no EAN ou no Nome do produto
+                            if (ean.includes(termo) || nomeProduto.includes(termo)) atendeFiltro = true;
+                        }
+
+                        if (atendeFiltro) {
+                            if (!produtosMap[ean]) {
+                                produtosMap[ean] = {
+                                    produto: v.produto,
+                                    categoria: catProduto,
+                                    ean: ean,
+                                    preco: precoUnitario,
+                                    estoque: 0
+                                };
+                            }
                         }
                     }
                 });
 
-                // 2. Mapeia o estoque da loja correspondente e zera se for negativo
+                // 2. Mapeia o estoque da loja correspondente e TRATA NEGATIVOS COMO ZERO
                 if (registroEstoque && registroEstoque.data) {
                     for (let k in registroEstoque.data) {
                         let item = registroEstoque.data[k];
@@ -483,7 +566,7 @@
                 const listaProdutos = Object.values(produtosMap);
 
                 if (listaProdutos.length === 0) {
-                    showAlert(`Nenhum produto com EAN válido encontrado para "${termo}" na sua loja.`, "warning");
+                    showAlert("Nenhum produto com EAN válido encontrado para este filtro na sua loja.", "warning");
                     return;
                 }
 

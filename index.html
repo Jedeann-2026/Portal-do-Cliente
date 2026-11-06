@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ab Conveniencia - Portal do Cliente</title>
+    <title>AB Conveniência - Portal do Cliente</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -33,7 +33,7 @@
                 <div class="inline-flex bg-amber-500/10 p-3 rounded-2xl border border-amber-500/20 mb-1">
                     <i class="fa-solid fa-lock text-amber-500 dark:text-amber-400 text-2xl"></i>
                 </div>
-                <h1 class="text-lg font-bold text-slate-900 dark:text-amber-400">Portal AB conveniencia - Acesso</h1>
+                <h1 class="text-lg font-bold text-slate-900 dark:text-amber-400">Portal AB Conveniência - Acesso</h1>
                 <p class="text-xs text-slate-500 dark:text-slate-400">Entre com suas credenciais de cliente</p>
             </div>
 
@@ -80,9 +80,7 @@
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Selecione a Loja</label>
                     <select id="forgot-loja" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                         <option value="">-- Escolha a Loja --</option>
-                        <option value="KRIMET">KRIMET</option>
                         <option value="LAGO DI GARDA">LAGO DI GARDA</option>
-                        <option value="VILA NAVAL ALBATROZ">VILA NAVAL ALBATROZ</option>
                     </select>
                 </div>
                 <div>
@@ -124,9 +122,7 @@
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Selecione a Loja</label>
                     <select id="reg-loja" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                         <option value="">-- Escolha a Loja --</option>
-                        <option value="KRIMET">KRIMET</option>
                         <option value="LAGO DI GARDA">LAGO DI GARDA</option>
-                        <option value="VILA NAVAL ALBATROZ">VILA NAVAL ALBATROZ</option>
                     </select>
                 </div>
                 <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg mt-2">
@@ -143,6 +139,13 @@
 
         <!-- TELA PRINCIPAL (APÓS O LOGIN) -->
         <div id="app-screen" class="hidden space-y-4">
+            
+            <!-- CABEÇALHO PRINCIPAL: AB CONVENIÊNCIA -->
+            <div class="bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 rounded-2xl p-4 shadow-lg text-center space-y-0.5">
+                <div class="text-xs uppercase tracking-widest font-semibold opacity-80">Portal do Cliente</div>
+                <h1 class="text-xl font-extrabold tracking-wide">AB Conveniência</h1>
+            </div>
+
             <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xl flex justify-between items-center">
                 <div class="flex items-center space-x-3">
                     <div class="bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20">
@@ -558,13 +561,31 @@
                 let produtosMap = {};
                 const lojaDoUsuario = usuarioLogado.loja.toUpperCase();
 
+                // Função auxiliar para converter valores monetários em formato string ou número
+                function parsePreco(val) {
+                    if (val === undefined || val === null) return 0;
+                    if (typeof val === 'number') return val;
+                    let limpo = String(val).replace('R$', '').trim();
+                    // Se tiver ponto e vírgula (ex: 1.234,56) ou apenas vírgula (ex: 10,50)
+                    if (limpo.includes(',') && limpo.includes('.')) {
+                        limpo = limpo.replace(/\./g, '').replace(',', '.');
+                    } else if (limpo.includes(',')) {
+                        limpo = limpo.replace(',', '.');
+                    }
+                    const num = parseFloat(limpo);
+                    return isNaN(num) ? 0 : num;
+                }
+
                 // 1. Mapeia dados da tabela vendas para a loja do utilizador
                 registroVendas.data.forEach(v => {
                     const clienteVenda = v.cliente ? String(v.cliente).trim().toUpperCase() : '';
                     const nomeProduto = v.produto ? String(v.produto).trim().toUpperCase() : '';
                     const catProduto = v.categoria ? String(v.categoria).trim().toUpperCase() : 'GERAL';
                     const ean = v.ean ? String(v.ean).trim() : '';
-                    const precoUnitario = parseFloat(v.vlrUnit || 0);
+                    
+                    // Busca flexível pelo preço em diferentes propriedades possíveis
+                    const brutoPreco = v.vlrUnit !== undefined ? v.vlrUnit : (v.preco !== undefined ? v.preco : (v.valor !== undefined ? v.valor : v.precoVenda));
+                    const precoUnitario = parsePreco(brutoPreco);
 
                     // Filtro rigoroso: ignora se não tiver EAN válido
                     if (!ean || ean === '' || ean === '0' || ean.toUpperCase() === 'S/EAN') return;
@@ -588,6 +609,11 @@
                                     preco: precoUnitario,
                                     estoque: 0
                                 };
+                            } else {
+                                // Se já existe, atualiza caso o preço atual seja maior que zero
+                                if (precoUnitario > 0) {
+                                    produtosMap[ean].preco = precoUnitario;
+                                }
                             }
                         }
                     }
@@ -602,7 +628,6 @@
                         
                         if (produtosMap[itemEan] && clienteEstoque === lojaDoUsuario) {
                             let qtdEstoque = Number(item.estoque) || 0;
-                            // Se o estoque for negativo, zera (Math.max(0, qtd))
                             produtosMap[itemEan].estoque = Math.max(0, qtdEstoque);
                         }
                     }

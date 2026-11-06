@@ -566,7 +566,6 @@
                     if (val === undefined || val === null) return 0;
                     if (typeof val === 'number') return val;
                     let limpo = String(val).replace('R$', '').trim();
-                    // Se tiver ponto e vírgula (ex: 1.234,56) ou apenas vírgula (ex: 10,50)
                     if (limpo.includes(',') && limpo.includes('.')) {
                         limpo = limpo.replace(/\./g, '').replace(',', '.');
                     } else if (limpo.includes(',')) {
@@ -583,11 +582,9 @@
                     const catProduto = v.categoria ? String(v.categoria).trim().toUpperCase() : 'GERAL';
                     const ean = v.ean ? String(v.ean).trim() : '';
                     
-                    // Busca flexível pelo preço em diferentes propriedades possíveis
                     const brutoPreco = v.vlrUnit !== undefined ? v.vlrUnit : (v.preco !== undefined ? v.preco : (v.valor !== undefined ? v.valor : v.precoVenda));
                     const precoUnitario = parsePreco(brutoPreco);
 
-                    // Filtro rigoroso: ignora se não tiver EAN válido
                     if (!ean || ean === '' || ean === '0' || ean.toUpperCase() === 'S/EAN') return;
 
                     if (clienteVenda === lojaDoUsuario) {
@@ -596,7 +593,6 @@
                         if (categoriaFiltro) {
                             if (catProduto === categoriaFiltro) atendeFiltro = true;
                         } else if (termo) {
-                            // Busca por aproximação (contém) no EAN ou no Nome do produto
                             if (ean.includes(termo) || nomeProduto.includes(termo)) atendeFiltro = true;
                         }
 
@@ -610,7 +606,6 @@
                                     estoque: 0
                                 };
                             } else {
-                                // Se já existe, atualiza caso o preço atual seja maior que zero
                                 if (precoUnitario > 0) {
                                     produtosMap[ean].preco = precoUnitario;
                                 }
@@ -648,18 +643,29 @@
                         ? item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
                         : 'R$ 0,00';
 
+                    // URL pública da imagem no Supabase Storage baseada no EAN
+                    const urlImagem = `https://mjkqkyuolsqhtxwzivof.supabase.co/storage/v1/object/public/produtos-imagens/${item.ean}.jpg`;
+                    const imgFallback = "https://via.placeholder.com/80?text=Sem+Foto";
+
                     const card = document.createElement('div');
                     card.className = "bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xl flex justify-between items-center gap-3";
                     card.innerHTML = `
-                        <div class="space-y-1">
-                            <span class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">${item.categoria}</span>
-                            <h2 class="font-bold text-slate-900 dark:text-white text-sm leading-snug">${item.produto}</h2>
-                            <div class="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
-                                <span>EAN: ${item.ean}</span>
-                                <span class="text-amber-600 dark:text-amber-400 font-semibold">| Estoque: ${item.estoque}</span>
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <img src="${urlImagem}" 
+                                 onerror="this.onerror=null; this.src='${imgFallback}';" 
+                                 alt="${item.produto}" 
+                                 class="w-14 h-14 object-cover rounded-xl border border-slate-200 dark:border-slate-800 shrink-0 bg-slate-100 dark:bg-slate-950">
+                            
+                            <div class="space-y-1 min-w-0">
+                                <span class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">${item.categoria}</span>
+                                <h2 class="font-bold text-slate-900 dark:text-white text-sm leading-snug truncate">${item.produto}</h2>
+                                <div class="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                                    <span>EAN: ${item.ean}</span>
+                                    <span class="text-amber-600 dark:text-amber-400 font-semibold">| Est: ${item.estoque}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right shrink-0">
                             <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Preço Venda</span>
                             <span class="text-base font-extrabold text-emerald-600 dark:text-emerald-400">${precoFormatado}</span>
                         </div>

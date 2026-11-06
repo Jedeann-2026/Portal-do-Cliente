@@ -1,72 +1,84 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexxa - Portal do Cliente</title>
+    <title>Ab Conveniencia - Portal do Cliente</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <!-- FontAwesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- SDK Oficial do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans p-4">
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans p-4 transition-colors duration-200">
 
     <div class="max-w-md w-full mx-auto space-y-4">
         
+        <!-- BOTÃO DE ALTERNAR TEMA DIA / NOITE -->
+        <div class="flex justify-end pt-2">
+            <button id="btn-toggle-theme" type="button" class="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition shadow-md" title="Alternar Tema Dia/Noite">
+                <i id="theme-icon" class="fa-solid fa-sun text-sm"></i>
+            </button>
+        </div>
+
         <!-- TELA DE LOGIN -->
-        <div id="login-screen" class="bg-slate-900 rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4 mt-6">
+        <div id="login-screen" class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
             <div class="text-center space-y-1">
                 <div class="inline-flex bg-amber-500/10 p-3 rounded-2xl border border-amber-500/20 mb-1">
-                    <i class="fa-solid fa-lock text-amber-400 text-2xl"></i>
+                    <i class="fa-solid fa-lock text-amber-500 dark:text-amber-400 text-2xl"></i>
                 </div>
-                <h1 class="text-lg font-bold text-amber-400">Portal Nexxa - Acesso</h1>
-                <p class="text-xs text-slate-400">Entre com suas credenciais de cliente</p>
+                <h1 class="text-lg font-bold text-slate-900 dark:text-amber-400">Portal AB conveniencia - Acesso</h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Entre com suas credenciais de cliente</p>
             </div>
 
             <form id="form-login" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Usuário / Nome</label>
-                    <input type="text" id="login-user" placeholder="Digite seu usuário..." required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Usuário / Nome</label>
+                    <input type="text" id="login-user" placeholder="Digite seu usuário..." required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Senha</label>
-                    <input type="password" id="login-pass" placeholder="********" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Senha</label>
+                    <input type="password" id="login-pass" placeholder="********" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                 </div>
                 <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg mt-2">
                     Entrar no Sistema
                 </button>
             </form>
 
-            <div class="border-t border-slate-800 pt-3 flex justify-between items-center text-xs">
-                <button id="btn-show-forgot" type="button" class="text-slate-400 hover:text-amber-400">
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-3 flex justify-between items-center text-xs">
+                <button id="btn-show-forgot" type="button" class="text-slate-500 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400">
                     Esqueci a senha
                 </button>
-                <button id="btn-show-register" type="button" class="text-amber-400 hover:underline">
+                <button id="btn-show-register" type="button" class="text-amber-600 dark:text-amber-400 hover:underline">
                     <i class="fa-solid fa-user-plus mr-1"></i> Novo Utilizador
                 </button>
             </div>
         </div>
 
         <!-- TELA DE REDEFINIÇÃO DE SENHA -->
-        <div id="forgot-screen" class="hidden bg-slate-900 rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4 mt-6">
+        <div id="forgot-screen" class="hidden bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
             <div class="text-center space-y-1">
                 <div class="inline-flex bg-amber-500/10 p-3 rounded-2xl border border-amber-500/20 mb-1">
-                    <i class="fa-solid fa-key text-amber-400 text-2xl"></i>
+                    <i class="fa-solid fa-key text-amber-500 dark:text-amber-400 text-2xl"></i>
                 </div>
-                <h1 class="text-lg font-bold text-amber-400">Redefinir Senha</h1>
-                <p class="text-xs text-slate-400">Informe seu usuário e loja para cadastrar nova senha</p>
+                <h1 class="text-lg font-bold text-slate-900 dark:text-amber-400">Redefinir Senha</h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Informe seu usuário e loja para cadastrar nova senha</p>
             </div>
 
             <form id="form-forgot" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nome do Utilizador</label>
-                    <input type="text" id="forgot-user" placeholder="Ex: João Silva" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nome do Utilizador</label>
+                    <input type="text" id="forgot-user" placeholder="Ex: João Silva" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Selecione a Loja</label>
-                    <select id="forgot-loja" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Selecione a Loja</label>
+                    <select id="forgot-loja" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                         <option value="">-- Escolha a Loja --</option>
                         <option value="KRIMET">KRIMET</option>
                         <option value="LAGO DI GARDA">LAGO DI GARDA</option>
@@ -74,43 +86,43 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nova Senha</label>
-                    <input type="password" id="forgot-new-pass" placeholder="********" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nova Senha</label>
+                    <input type="password" id="forgot-new-pass" placeholder="********" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                 </div>
                 <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg mt-2">
                     Atualizar Senha
                 </button>
             </form>
 
-            <div class="border-t border-slate-800 pt-3 text-center">
-                <button id="btn-back-login-forgot" type="button" class="text-xs text-slate-400 hover:text-white">
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-3 text-center">
+                <button id="btn-back-login-forgot" type="button" class="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                     <i class="fa-solid fa-arrow-left mr-1"></i> Voltar ao Login
                 </button>
             </div>
         </div>
 
         <!-- TELA DE CADASTRO DE NOVO UTILIZADOR -->
-        <div id="register-screen" class="hidden bg-slate-900 rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4 mt-6">
+        <div id="register-screen" class="hidden bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
             <div class="text-center space-y-1">
                 <div class="inline-flex bg-amber-500/10 p-3 rounded-2xl border border-amber-500/20 mb-1">
-                    <i class="fa-solid fa-user-plus text-amber-400 text-2xl"></i>
+                    <i class="fa-solid fa-user-plus text-amber-500 dark:text-amber-400 text-2xl"></i>
                 </div>
-                <h1 class="text-lg font-bold text-amber-400">Novo Utilizador</h1>
-                <p class="text-xs text-slate-400">Preencha os dados para criar o acesso</p>
+                <h1 class="text-lg font-bold text-slate-900 dark:text-amber-400">Novo Utilizador</h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Preencha os dados para criar o acesso</p>
             </div>
 
             <form id="form-register" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nome do Utilizador</label>
-                    <input type="text" id="reg-user" placeholder="Ex: João Silva" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nome do Utilizador</label>
+                    <input type="text" id="reg-user" placeholder="Ex: João Silva" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Senha</label>
-                    <input type="password" id="reg-pass" placeholder="********" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Senha</label>
+                    <input type="password" id="reg-pass" placeholder="********" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Selecione a Loja</label>
-                    <select id="reg-loja" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Selecione a Loja</label>
+                    <select id="reg-loja" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                         <option value="">-- Escolha a Loja --</option>
                         <option value="KRIMET">KRIMET</option>
                         <option value="LAGO DI GARDA">LAGO DI GARDA</option>
@@ -122,8 +134,8 @@
                 </button>
             </form>
 
-            <div class="border-t border-slate-800 pt-3 text-center">
-                <button id="btn-back-login" type="button" class="text-xs text-slate-400 hover:text-white">
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-3 text-center">
+                <button id="btn-back-login" type="button" class="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                     <i class="fa-solid fa-arrow-left mr-1"></i> Voltar ao Login
                 </button>
             </div>
@@ -131,38 +143,38 @@
 
         <!-- TELA PRINCIPAL (APÓS O LOGIN) -->
         <div id="app-screen" class="hidden space-y-4">
-            <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-xl flex justify-between items-center">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xl flex justify-between items-center">
                 <div class="flex items-center space-x-3">
                     <div class="bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20">
-                        <i class="fa-solid fa-store text-amber-400 text-lg"></i>
+                        <i class="fa-solid fa-store text-amber-500 dark:text-amber-400 text-lg"></i>
                     </div>
                     <div>
-                        <h2 id="lbl-loja-nome" class="text-sm font-bold text-amber-400">--</h2>
-                        <p id="lbl-user-nome" class="text-[10px] text-slate-400">Utilizador: --</p>
+                        <h2 id="lbl-loja-nome" class="text-sm font-bold text-slate-900 dark:text-amber-400">--</h2>
+                        <p id="lbl-user-nome" class="text-[10px] text-slate-500 dark:text-slate-400">Utilizador: --</p>
                     </div>
                 </div>
-                <button id="btn-logout" type="button" class="bg-slate-800 hover:bg-rose-950 text-slate-300 hover:text-rose-300 px-3 py-2 rounded-xl text-xs transition border border-slate-700" title="Sair">
+                <button id="btn-logout" type="button" class="bg-slate-100 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-950 text-slate-700 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-300 px-3 py-2 rounded-xl text-xs transition border border-slate-200 dark:border-slate-700" title="Sair">
                     <i class="fa-solid fa-right-from-bracket"></i> Sair
                 </button>
             </div>
 
             <!-- OPÇÃO DE SELEÇÃO DE CATEGORIA + PESQUISA CONTÉM -->
-            <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-xl space-y-3">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xl space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">
-                        <i class="fa-solid fa-list-check text-amber-400 mr-1"></i> Filtrar por Categoria:
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        <i class="fa-solid fa-list-check text-amber-500 dark:text-amber-400 mr-1"></i> Filtrar por Categoria:
                     </label>
-                    <select id="select-categoria" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                    <select id="select-categoria" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                         <option value="">-- Carregando categorias... --</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">
-                        <i class="fa-solid fa-magnifying-glass text-amber-400 mr-1"></i> Ou Pesquisar Produto (Contém):
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        <i class="fa-solid fa-magnifying-glass text-amber-500 dark:text-amber-400 mr-1"></i> Ou Pesquisar Produto (Contém):
                     </label>
                     <div class="flex gap-2">
-                        <input type="text" id="input-search" placeholder="Digite parte do nome ou EAN..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                        <input type="text" id="input-search" placeholder="Digite parte do nome ou EAN..." class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                         <button id="btn-buscar" type="button" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition">
                             <i class="fa-solid fa-search"></i>
                         </button>
@@ -209,6 +221,7 @@
         const btnBackLogin = document.getElementById('btn-back-login');
         const btnBackLoginForgot = document.getElementById('btn-back-login-forgot');
         const btnLogout = document.getElementById('btn-logout');
+        const btnToggleTheme = document.getElementById('btn-toggle-theme');
         
         const lblLojaNome = document.getElementById('lbl-loja-nome');
         const lblUserNome = document.getElementById('lbl-user-nome');
@@ -219,6 +232,38 @@
         const statusAlert = document.getElementById('status-alert');
 
         let usuarioLogado = null;
+
+        // LÓGICA DO TEMA DIA / NOITE
+        function inicializarTema() {
+            const temaSalvo = localStorage.getItem('nexxa_tema');
+            if (temaSalvo === 'light') {
+                document.documentElement.classList.remove('dark');
+                atualizarIconeTema(false);
+            } else {
+                document.documentElement.classList.add('dark');
+                atualizarIconeTema(true);
+            }
+        }
+
+        function alternarTema() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('nexxa_tema', isDark ? 'dark' : 'light');
+            atualizarIconeTema(isDark);
+        }
+
+        function atualizarIconeTema(isDark) {
+            const icon = document.getElementById('theme-icon');
+            if (icon) {
+                icon.className = isDark ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
+            }
+        }
+
+        btnToggleTheme.addEventListener('click', (e) => {
+            e.preventDefault();
+            alternarTema();
+        });
+
+        inicializarTema();
 
         // Navegação de Telas
         btnShowRegister.addEventListener('click', (e) => {
@@ -363,7 +408,7 @@
             }
         });
 
-        // Gerenciar Login (Apenas lê a tabela id='usuarios', sem nunca apagá-la ou alterá-la)
+        // Gerenciar Login (Original - 100% Funcional com Supabase)
         formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
             const usuarioDigitado = loginUser.value.trim();
@@ -579,19 +624,19 @@
                         : 'R$ 0,00';
 
                     const card = document.createElement('div');
-                    card.className = "bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-xl flex justify-between items-center gap-3";
+                    card.className = "bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xl flex justify-between items-center gap-3";
                     card.innerHTML = `
                         <div class="space-y-1">
-                            <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">${item.categoria}</span>
-                            <h2 class="font-bold text-white text-sm leading-snug">${item.produto}</h2>
-                            <div class="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
+                            <span class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">${item.categoria}</span>
+                            <h2 class="font-bold text-slate-900 dark:text-white text-sm leading-snug">${item.produto}</h2>
+                            <div class="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                                 <span>EAN: ${item.ean}</span>
-                                <span class="text-amber-400 font-semibold">| Estoque: ${item.estoque}</span>
+                                <span class="text-amber-600 dark:text-amber-400 font-semibold">| Estoque: ${item.estoque}</span>
                             </div>
                         </div>
                         <div class="text-right">
-                            <span class="text-[10px] text-slate-400 block">Preço Venda</span>
-                            <span class="text-base font-extrabold text-emerald-400">${precoFormatado}</span>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Preço Venda</span>
+                            <span class="text-base font-extrabold text-emerald-600 dark:text-emerald-400">${precoFormatado}</span>
                         </div>
                     `;
                     resultsContainer.appendChild(card);
@@ -606,9 +651,9 @@
         function showAlert(msg, type) {
             statusAlert.innerText = msg;
             statusAlert.className = "p-3 rounded-xl text-xs text-center font-medium border ";
-            if (type === 'error') statusAlert.classList.add('bg-rose-950/60', 'border-rose-800', 'text-rose-300');
-            else if (type === 'warning') statusAlert.classList.add('bg-amber-950/60', 'border-amber-800', 'text-amber-300');
-            else if (type === 'info') statusAlert.classList.add('bg-slate-900', 'border-slate-800', 'text-amber-400');
+            if (type === 'error') statusAlert.classList.add('bg-rose-100', 'dark:bg-rose-950/60', 'border-rose-300', 'dark:border-rose-800', 'text-rose-700', 'dark:text-rose-300');
+            else if (type === 'warning') statusAlert.classList.add('bg-amber-100', 'dark:bg-amber-950/60', 'border-amber-300', 'dark:border-amber-800', 'text-amber-800', 'dark:text-amber-300');
+            else if (type === 'info') statusAlert.classList.add('bg-white', 'dark:bg-slate-900', 'border-slate-200', 'dark:border-slate-800', 'text-amber-600', 'dark:text-amber-400');
             statusAlert.classList.remove('hidden');
         }
 

@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- SDK Oficial do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- ZXing Browser UMD para Leitura de Código de Barras / QR via Câmera no iOS/Safari -->
-    <script src="https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/zxing-browser.min.js"></script>
+    <!-- ZXing Library para Leitura Rápida de EAN-13 via Câmera no iOS/Safari e Android -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans p-4 transition-colors duration-200">
 
@@ -33,7 +33,7 @@
         <div id="login-screen" class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
             <div class="text-center space-y-1">
                 <div class="inline-flex p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-900 mb-1 shadow-md">
-                    <img src="https://mjkqkyuolsqhtxwzivof.supabase.co/storage/v1/object/public/produtos-imagens/logoab.jpeg" alt="AB Conveniência" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=AB+Conveniencia';">
+                    <img src="data:image/jpeg;base64,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Nf/ff2t7+3f3mr7Wtvv7fec1t/eb23+99432v3d1t7w+/v7++v94Dvvf+8v7+9fe/vHfa141v977w+/v7+8bfe/va3dbe39+8Lve294Nve9t4/v31m+19b9994/tfrXbvtNe943vv/vf/ffWb7+3v7wvv3u/vf+5vve+9vf2vv+/vNbe8f/APff3veb/vfve/fvf5nvv7e/vf3veb2/u++8Nve++9te7x7/AH1r93v73g97e9vv+d/vv/f331re+1v9/nv+/vHv719/a3vv7fudv+dveb/fe3v+dfa9/v77w+/v0+9r3h9/v72v2veav9+/v7/vD7+9/wC/fe3vv7x73+9+95r32vfeD39417wHvbe1tbe16+/++vf3hve++v8Aevvv7/vdvffv/eb/AH3r7wttfe1/fvftrffveb/e31v3vHv9+/veavtt7e/f61v79+394Pfa1u7+/ve++1t+8L7fve3v9++8f/e39/f3m9/ff95v99/eP3vvvvX30He+/v3v/ed9r94X2/et95v97e/vHtv7/v31mvfa3/ea3+9/f31+9t7+/vG+1/ff++vfeL7+1u+/f8Af3mv33+9/f31j+1tbW3vv395q72vvte++s1t/vf+9t+/v1v9/ed9v+8G9/e/3ve3eavvve1u9Zq/fevv19++sfbW/feve8b+3fvfv3h/f39+333++a+9re1u9+812t7+/vHfbte8N/vv/edr7+/vv0+8bf/ALw/+0Xte2ve1v3vv39++8b7/vedre/+/edve8b/AH99/vfvv+81vte+813v3/eDf/eDe996x/vv3+/edv71+/vvOfe1ve8fvv8Af5vvft7x+995vvfe14b+3f5nvv8Af3hve++9+97e9tfe8b+9veavttbzbe+83995vf8Avf8Av7X1N9t/6zfe3vvv9+/vP9veL3/f7vvA3v339++1/fvf2teG/tvb3j+1vXfv98x+9vfX3vvfevtbXvC397e1/r3997w3tbb2ve19ffrG++1vfevtftb33nfe9vf/ef2vfb/c3/vv0ve1vvC32/e/vtvb++8b39/v3v3vvp3vvb2ve8L/Xv3vvA7e1ve+1t+31/eP3tfe/f+42vv799tfe9v+evv+/v8x/8A31/eb3vvvvf3mvt3vv3h9/3r1n//2gAIAQLDAD8A3y426q1sVp2g2vK/aVveDveVvK/a/aa+8Pte1u01v9r9p2tb/v1g2t3a99t+2/vefeV8f9a2/et7e73v8Avvtve813a3tveH3vv9+8b3/te9v/AHh73v7v73+4e9+8vfe8923te1vevvf949/vvvf/ANrwt7a3lfxmveHevvfvffv2g9r09t7/AH+9f3m9r2t7/edvv+d4X3v7v+9Z/ee99a/3h9/vvte97wPv31rfvvffvrH/APd/+8b+/vvvrffed9r+0ve3vv+Z7++vvb3+9vrNfva31vf/AHh7e8fv736+v97feve/ff8Av51n/tv33m9/7X9+/ec/vb9423vL62vrO++vfv2vvvrN97e2t/vb/evvefe/vrf313+9++399+8bfa2976+v8x/v/vfvefe/fva/v95re1vK3vrHfv7zvtvrP39+vvvvffeb7e8rW1vK+tvefvv95vv7x9/399a+/d/e9/ve1vvD2/v995q+3veveb2v/Z" alt="AB Conveniência" class="h-16 w-auto object-contain">
                 </div>
                 <h1 class="text-lg font-bold text-slate-900 dark:text-amber-400">Portal AB Conveniência - Acesso</h1>
                 <p class="text-xs text-slate-500 dark:text-slate-400">Entre com suas credenciais de cliente</p>
@@ -83,8 +83,6 @@
                     <select id="forgot-loja" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                         <option value="">-- Escolha a Loja --</option>
                         <option value="LAGO DI GARDA">LAGO DI GARDA</option>
-                        <option value="KRIMET">KRIMET</option>
-                        <option value="VILA NAVAL ALBATROZ">VILA NAVAL ALBATROZ</option>
                     </select>
                 </div>
                 <div>
@@ -127,8 +125,6 @@
                     <select id="reg-loja" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
                         <option value="">-- Escolha a Loja --</option>
                         <option value="LAGO DI GARDA">LAGO DI GARDA</option>
-                        <option value="KRIMET">KRIMET</option>
-                        <option value="VILA NAVAL ALBATROZ">VILA NAVAL ALBATROZ</option>
                     </select>
                 </div>
                 <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg mt-2">
@@ -148,7 +144,7 @@
             
             <!-- CABEÇALHO PRINCIPAL: AB CONVENIÊNCIA -->
             <div class="bg-slate-900 rounded-2xl p-4 shadow-lg border border-slate-800 flex flex-col items-center justify-center space-y-1 text-center">
-                <img src="https://mjkqkyuolsqhtxwzivof.supabase.co/storage/v1/object/public/produtos-imagens/logoab.jpeg" alt="AB Conveniência" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=AB+Conveniencia';">
+                <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wgARCAHaAtMDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAECAwQFBv/EABkBAQEBAQEBAAAAAAAAAAAAAAABAgMEBf/aAAwDAQACEAMQAAAC2zhPnrTLlYbPRZvM0Hq15NaetXkpHqzy049M/O2Z13ziSzexHlkvSrwhqqpNSUBaiTWsoDWW4LUsKyywqRYoA4hKozJalcRSXBSXBSXFUuwStzKhJlg4mpN1llxSq0Gcs0Kgi5VKW1QJZRRmtBK3ElsnQRqnjDfLnI6Rzg3xxFmqFBVqrepIg7JgbxCiD8noFZYZpbLc6wWb3m5LbzGq5NStIGRVTUCyairJKKqSSskRLGJUxFjQhiLAAALAAAKAAGgJT1mo0y1jIbTecJuiYjTRjcUzOkAAAAgAgAAAAAAAAABoAadAAAAAABYB15u3SfO9lUpKUFEkoqpKCskoqyRFVJJWSSKZERiKBFjEDQIAUAABYAUDdkS6esZntt3jBbtNZz22LWEmt5jGUNYQKgFaCFop25vL6KgOXUABAAAAoYimIGIGAAAAAAAAwAABoLAOuNqrXz/XNQjZNRVSSVjIlNIsaQjEUCBiBgWAADBEgiXVkRz3mD0P08KZze+ZNPWG4tibi5qTi5WhBFq5UWtRJq1AlE1aIc1zydPg9dpXMYAAAmgAAAAAAAAGgYmCYAANAAFgzpi1I8fpBKxoVMSsYgBFjQAAAAADeronFn6G+PP6uwGDTaBwu7nPMuuvU6Dov+h4209824uSTi5JOLiTi5WJAgRILUhaohWgIALc2bVk8PqcoS56mwpMBAAIGIGCGAgAAAADAUAAAAC0ZrLQuHZiAQWAgAQAWAAAAAOcOwdK0M0aBiAAATPPcv1fliPQ5uz1cL2j1+aTi5JCjFksFPDp1o8aGOnXq5hjeymkzuTgS9DTx+r6fPJC9PEAtQC05dmf5/q1P0xy35t+jK8hHv8AB1mIGggQAAGCcrIl1lzlN0tZwS3reca142olNnn7SEwALiYlYjn0AQCLAAAAQABQAMHF3qMHQlAIAAABNAAPzPpcR5eRXvPTdF30PI3F6xJxllx47cXg9oBnQMREnUHJkOlh6Hfk0Hs84IAKc7yxS+d6vQT86Zvqt/i/ZSnkfYeds5ko6u2M72T7csc9ktc81lzuI2IZkq6mr45aZrfDn156b+fFcezlGXO2OMtGINxMzcQiVoABDQUAAAAmACPZk9LLqAzQAAAABAAAAHmMHpvN1Lbzd3q4WNHr88nFwcnr4fL2yyT8/eY3qRJ2WUmmzpiNgeriINQAFguzeP0IDz9W1Oxep8x15e9zujDN8dtwy9HLe+fDtz6ceYsa6NeIxdFcLJqtaJ1jN9JmA47BiElLUm06ADqkzGuUIGIoAAQgAAANA2rDod2q3GkAMQMUBy8r6kYAIAADyvquYecthHeeiQn9LyMRZKIZZbL1jcZM3liLACwQKAAACHLXn2S475ktmXzdlooMa9m8mvGvLc70fndSUtV3q4YrNUumKLZvXMCKOEYXU8F2Tz901Lz9WN2KSkAOgA7YHPXGA0AQ0CAAAAADTH2uZ6eWSDNAAADz3V8oL0vmNtnrUEoAAgaGeSzeg4Fl2rnb/ZwYHp5MQjAAAAAABMAAAKAFBESg587gV+bw+ru9ryvqueqfHe48hZHRzX6OXRXPDfHCY1qrpMakkQJtU2XLY6GmDToAO0I5644GoAAIGIBoGAElujq7hZ0AAACfIOVhasJJ16rb5r02agBDQAC8j7DjHB0UHTPQE/o+QApiYAICUsiqGNaDJHOtpisNIn25ggAAaB4Ojg8PeHsfGej4detw+3kl8ib9FnKXf0V5l+svjyOj1QvndHZUc6/SHn+Zdl1LSMtZYAxFMA6xE565YGoAAAAAAwBkvTczuZqQSjQMTK/H9Pj2Jp05KaP1XlemvfAzRAAA4SkeMq7PGs06MG728GB6OQ0FGfZz/D6JRDlsAlAABlu7mdH18WB6eIAABLJqyebrn6fMt8nf2gnmgAxEMqqNRgqXpnDyV6bn8HMglLUcoy1mQgYFAB1AOeuYBqAAAAAAMLqu7L0ZBmoAAAy6vKmODNQkX6zXbfP0cqZTj2x6SfK6vg9KAxoABoKvI+184crTmn1xuE/o+UAJc7oVefpgGePuDdRbEQwXQzavVyAPTyAAEx4d/M8vWMoy8vfr7PPao6WWrBLropLJuFg7/QbZfHUe38+cdSNRMdhJSsABiYAV1QMa5YjUGiGAAAMZp9Pk150JqAAAgc/zV+ewtls9HOFgevzsDUSkhel8x1/L36KF4+7EA0EsumR4hdDnWbLce33+cA7c3KLjnQ3ZfB6YSssszmydzhv1nXEFKPowAqaAABc/Tm8HoJK/lvqdxrOni2M8RHqcyw7vD9ObwM0rsrrylF1OoMdg07AAGAJo64jOuUBqAEDQMAfRw+pluTWagAADg9XyVkdC1erkNP18G00BkiGiMlXN+oWTZ831oDNABuLMXlvceSrJtw3duewD3+ZgSMTG4tGIRoSpNWiaUBK2ZeWqIj8Hoe/DNfaKq3NGsBxcKWpLt8OZ7VcPXm9LiU8ihqVy2nqMAGgYmAB0iJnXPA1ACAGDV50+zGWNIEAABzTk447fRzkB7vO2mhJOZCGXnvXTiXDtqhQc99L03ifV89ahrNAAAJczpM8QXUam+zJr9/lAOuAAYEACAJRNUIFUnm5blia8XckpZoBV/U4il6/JioGOwYUhqIkgGOiQ6QCAANMQBtKjOqANQAgaY/Q8v0uaIJRAABHyHU5OpfaH0vKNPWW1JCl8/A3VxDydwGJti6nMkvs1VbmggYA3FnH4HtPH2Q6PN1ejnpA9nmABg4Q4ytVwzq8ywxrbTjjx3ZWHHoMYxlAAlJCJBFtiGCUgQ2JjEwACkAgAABaQJUAAA5R60vU0izRNQABm0+XrFtz6fbwEP08W0xwnz+G60Hi9IyQm3YhghkdjteR781vXNqjsPhVHol5iqPV+dwwqFkHrOqNL65nGozZuvbm5I+pqzfNElSGxDBNtE2CGUhsRO1c5oqSDLCt9mqXlAWDUyzR3tOdeZw+y8lZSJ6gmIgAAGIlYgYBb6vm9bGkBCGgUaTN5u2G5sdEfd59DyRzdz5yzdWNrz9BjzpsdgMEMAHKhoUZoi05QCEMsRIFIlVasY/V+buzbuhybSHJ72Kzny1ejPJr0fn6gSDXo6e6XxaCyfa27Iqtx4Ze1Ty95yMca7PZ4N+KXyckalm/B6Q6EZeYzfT8rps8U78+8sCgBAAZIlgAFlYegq4pm9OjnEuyvOyyMQIssGSqsmiJIIkmRk5EWykOcQNlBU+rdHFO/YvnF6nziUz7XVXxi63KDXk7JZxvY+Ri30HB9Oeao0ZT1zXKOsvI1HseFx4G/wBX5X1YcjrM8Sd3h2el3Yd8vi+tyvTG3kdfxZTFuxNlRvquj2WTXlzfJJm5p9dx+zm4vKelyFvZ5nTjl+c9r5TUzCNQAsAC4mS5xMAYEnLXG2JAntjA/QXS+ZXf5FmeT7pxK/ZecMCbrqVeh5ebTs5/ozxa28+yzvcT1wvJ9niy+xhPhHVq8rI9DwFWej6vN6A/N+hkeM7WLcdryPr/ACJo9N5r0p5vNqzHrOd0UcO3qwMfm/V+UNfqvK+qOR0ePzT2PD69hzujXM8d6jy3dOr432fJPNzk7Il3WOFZdTXsc+ijN8hOHWru2Lm5dQ8pTXsF4209dzOkR4o05emWJ2ABsJmbhDZR29deNWPjzNHnOzzjods5B1IeOR7jPzO2eO73O6hvrJR5Sj1nmK9byOxxTjey8T6Ul5r2vjzp97PScBZ9R62uzCapcWuOh5jZir0+zJqPO+n8P1D0OHosfkPXeQNfpfN+jPOZ7qT1fE7eE8uvQWnmV6znmP1Pl/UHB4fb4Zv9T4nonpyLjxs66dPbWeQ7MdOFRGmXL5lb+DWWe3r87TLm9b5G2z2PkaIAx0mCdeXGS7MsJJJxeoAHRAzrD6fzXsIq8l3fOypkrF6Hg+kXo+N9jxcXhS7Fq4PU4N9nB6HC7wuV0/LWe4xYu0Lh93z8cfo82yva87XdB5nveQpbsHSPT+f9A48jZ6orzOH2Xjj0l+aw8mIrud3xHajveN7HBOr6Px2ylTlintzx9Uvs4eMR7Dk8VGrteblZtwANp1oVChAWSBrFSQlIEMQTKQwQwGADCJJCYAwsADoETOs3sPGelh+a9pizryt/f3WeU6d3nz22BdA4m7dGV82vz1kfXeP9IT8z1+NVnp/LXJ7LzleKWqcJanc6fk4y9TkAj15ZHZq5cTpV4BdOYSSQEZBUgBRkhTiyJIBMEMEMEMRDdIYIbIqQJzs3nOW15qLo6lYGKA6QwQ3YhghsiTdVl1MAEoAbRGdZLqSz0evyKzfWYOAi2llS15GbM1ahDKGMipxCSYRkkjIYAUlapYMEAZEnFUMRE9ZhLZVSbs5Sp3Gc0VEAAcp9M0iliyjpz9Mzq0US3yMe8302Vc9z30Ptzor15OWtVV0+2Xg2YcXVVKGbEHz1bZmN51ywqugc9R0VgDdHGGpZiL6BzQ04ADYBm5AKQwiSQhsQwSYJ6LYxD11kW3DEp661y6MvRTNQ4jlG2uhh6HMipp1LoZVLopz6zGJ2b89OqXHsaSeR1rO/N0kzZ9/MG06nOu/vjLK3Pz1tpZ1wUxOW91VEumdGRHO7aKVW7GlGqiKXXlTi6EAYOEMEAAAAAAAwQwTTAA3EjOsA794zmh7mc0BnL0VE0VpPnrfXbTm5NeTWW8/oc41Uzqo6PO2xkhfRTupZvyRrgadPfz0dDnohsKvuwgTgGmmADQIYDASkhDATBMATEQwQwQygGIABgmAACYACGIGAACAAAAAvQAzrAmazAkKhkIYgAoANARbCI2IYIYJgAAhgAAAAAAAAAAhghgAAAAAJgmixgAAAAAAAAAAAAAAJgCYAAAAAAADEMhEmuwiS40FyAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACRiAABgAwRIIkhYkmQJuKyxlRYlg5IQyBtypyc1FycRJKVJqkAIBGgLSBvNBuVziNiMhrZjNoYjcVhNqMZrRlNRGU1usZtkYDeRgNyMRsRkNaMpqVZjQGcvCgvCg0MzGlxlNguM1RM5oCgvIoLxaS8KnaS1FoVK5JSrkVFgQckIYJMEmVEbSLYpKBFjpFtKkWKDsaBEplVliKyxJMRX//2gAIAQEAAD8A3yp6l5S5271l3rLvuXesv9y71l/uXey+71lt9y+2bveb3e6vveb3epfbtj37w6F/mXm17x8613l213v7w6291d9u6utv+Au6u+9f5mttrd/mPna26e0Pbe9f70D2t/mffb95rba3es1v8Aev8Aed9u3t7zfb+799rXftfbvrHfa2t4b3b19t7/AHmr7X3/AHgPtbb++f5mvtr97wHtbevtv3g121vv+8b2vt7/AB52avtveH3tvXftm0339v395va2t95q+9fe3vD+/ev94Bfa2tbwrttbe/b3m/t30/e/85ve19/fv99Bva2v9+/3m9/7X+81vb+v/P8Afa1ttbztt2/f51A7ba3esb+3fvNfa+96+/vmt/b943tv94O1v+dvea/fv/nvN7f3/fv9++37+8b23+dfu7B2t4N9u1u2/wC/feH2tb++3eN7/fv7xt39t5vbe701++a12t7f7+e9fvv7/vfvvtv/AHg329u/vv3mv9/ed7a/vv39r0/3g97fvfv++/vNf/ff2t7+3f3mr7Wtvv7fec1t/eb23+99432v3d1t7w+/v7++v94Dvvf+8v7+9fe/vHfa141v977w+/v7+8bfe/va3dbe39+8Lve294Nve9t4/v31m+19b9994/tfrXbvtNe943vv/vf/ffWb7+3v7wvv3u/vf+5vve+9vf2vv+/vNbe8f/APff3veb/vfve/fvf5nvv7e/vf3veb2/u++8Nve++9te7x7/AH1r93v73g97e9vv+d/vv/f331re+1v9/nv+/vHv719/a3vv7fudv+dveb/fe3v+dfa9/v77w+/v0+9r3h9/v72v2veav9+/v7/vD7+9/wC/fe3vv7x73+9+95r32vfeD39417wHvbe1tbe16+/++vf3hve++v8Aevvv7/vdvffv/eb/ AH3r7wttfe1/fvftrffveb/e31v3vHv9+/veavtt7e/f61v79+394Pfa1u7+/ve++1t+8L7fve3v9++8f/e39/f3m9/ff95v99/eP3vvvvX30He+/v3v/ed9r94X2/et95v97e/vHtv7/v31mvfa3/ea3+9/f31+9t7+/vG+1/ff++vfeL7+1u+/f8Af3mv33+9/f31j+1tbW3vv395q72vvte++s1t/vf+9t+/v1v9/ed9v+8G9/e/3ve3eavvve1u9Zq/fevv19++sfbW/feve8b+3fvfv3h/f39+333++a+9re1u9+812t7+/vHfbte8N/vv/edr7+/vv0+8bf/ALw/+0Xte2ve1v3vv39++8b7/vedre/+/edve8b/ AH99/vfvv+81vte+813v3/eDf/eDe996x/vv3+/edv71+/vvOfe1ve8fvv8Af5vvft7x+995vvfe14b+3f5nvv8Af3hve++9+97e9tfe8b+9veavttbzbe+83995vf8Avf8Av7X1N9t/6zfe3vvv9+/vP9veL3/f7vvA3v339++1/fvf2teG/tvb3j+1vXfv98x+9vfX3vvfevtbXvC397e1/r3997w3tbb2ve19ffrG++1vfevtftb33nfe9vf/ef2vfb/c3/vv0ve1vvC32/e/vtvb++8b39/v3v3vvp3vvb2ve8L/Xv3vvA7e1ve+1t+31/eP3tfe/f+42vv799tfe9v+evv+/v8x/8A31/eb3vvvvf3mvt3vv3h9/3r1n//2gAIAQLDAD8A3y426q1sVp2g2vK/aVveDveVvK/a/aa+8Pte1u01v9r9p2tb/v1g2t3a99t+2/vefeV8f9a2/et7e73v8Avvtve813a3tveH3vv9+8b3/te9v/AHh73v7v73+4e9+8vfe8923te1vevvf949/vvvf/ANrwt7a3lfxmveHevvfvffv2g9r09t7/AH+9f3m9r2t7/edvv+d4X3v7v+9Z/ee99a/3h9/vvte97wPv31rfvvffvrH/APd/+8b+/vvvrffed9r+0ve3vv+Z7++vvb3+9vrNfva31vf/AHh7e8fv736+v97feve/ff8Av51n/tv33m9/7X9+/ec/vb9423vL62vrO++vfv2vvvrN97e2t/vb/evvefe/vrf313+9++399+8bfa2976+v8x/v/vfvefe/fva/v95re1vK3vrHfv7zvtvrP39+vvvvffeb7e8rW1vK+tvefvv95vv7x9/399a+/d/e9/ve1vvD2/v995q+3veveb2v/Z" alt="AB Conveniência" class="h-16 w-auto object-contain">
                 <div class="text-[10px] uppercase tracking-widest font-semibold text-slate-400">Portal do Cliente</div>
             </div>
 
@@ -167,7 +163,32 @@
                 </button>
             </div>
 
-            <!-- OPÇÃO DE SELEÇÃO DE CATEGORIA + PESQUISA + LEITOR DE CÂMERA ZXING -->
+            <!-- CONTAINER DE LEITURA VIA CÂMERA (ZXing) -->
+            <div id="scanner-container" class="hidden bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-xl space-y-3">
+                <div class="flex justify-between items-center text-xs font-bold text-amber-400">
+                    <span><i class="fa-solid fa-barcode mr-1"></i> Scanner de Código de Barras (ZXing)</span>
+                    <span id="scan-status" class="text-[10px] text-slate-400 font-normal">Aguardando câmera...</span>
+                </div>
+                
+                <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+                    <video id="video-preview" class="w-full h-full object-cover"></video>
+                    <!-- Guia de Enquadramento Visual -->
+                    <div class="absolute inset-x-8 top-1/2 -translate-y-1/2 h-16 border-2 border-dashed border-amber-400/70 rounded-lg pointer-events-none flex items-center justify-center">
+                        <div class="w-full h-0.5 bg-rose-500/80 animate-pulse"></div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="btn-toggle-flash" type="button" class="flex-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold py-2.5 rounded-xl text-xs transition border border-slate-700 flex items-center justify-center gap-1.5">
+                        <i id="flash-icon" class="fa-solid fa-bolt"></i> Lanterna
+                    </button>
+                    <button id="btn-close-scanner" type="button" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-xmark"></i> Fechar Câmera
+                    </button>
+                </div>
+            </div>
+
+            <!-- OPÇÃO DE SELEÇÃO DE CATEGORIA + PESQUISA CONTÉM + BOTÃO DA CÂMERA -->
             <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xl space-y-3">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -184,29 +205,15 @@
                     </label>
                     <div class="flex gap-2">
                         <input type="text" id="input-search" placeholder="Digite parte do nome ou EAN..." class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-400">
+                        <!-- Botão para acionar Câmera (ZXing) -->
+                        <button id="btn-open-scanner" type="button" class="bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold px-3.5 py-2.5 rounded-xl text-xs transition border border-slate-700" title="Escanear Código de Barras">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
                         <button id="btn-buscar" type="button" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition">
                             <i class="fa-solid fa-search"></i>
                         </button>
                     </div>
                 </div>
-
-                <!-- BOTÃO DO LEITOR DE CÂMERA ZXING -->
-                <button id="btn-scan-camera" type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-camera text-sm"></i> Ler Código de Barras com Câmera (ZXing)
-                </button>
-            </div>
-
-            <!-- MODAL / CONTAINER DA CÂMERA AO VIVO ZXING (ESTILO DO MODELO) -->
-            <div id="scanner-container" class="hidden space-y-3">
-                <div class="relative w-full overflow-hidden rounded-2xl bg-slate-950 aspect-video flex items-center justify-center border border-slate-800 shadow-xl">
-                    <video id="video-preview" class="w-full h-full object-cover" muted playsinline></video>
-                    <!-- Linha Laser Vermelha Central (Estilo do Modelo) -->
-                    <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 h-0.5 bg-rose-600 shadow-[0_0_10px_#e11d48] animate-pulse pointer-events-none"></div>
-                </div>
-                <!-- Botão Vermelho "Parar Câmara" Exatamente Como na Imagem -->
-                <button id="btn-close-scanner" type="button" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-stop text-sm"></i> Parar Câmara
-                </button>
             </div>
         </div>
 
@@ -259,14 +266,17 @@
         const statusAlert = document.getElementById('status-alert');
 
         // Elementos do Leitor ZXing
-        const btnScanCamera = document.getElementById('btn-scan-camera');
         const scannerContainer = document.getElementById('scanner-container');
+        const btnOpenScanner = document.getElementById('btn-open-scanner');
         const btnCloseScanner = document.getElementById('btn-close-scanner');
-        const videoPreview = document.getElementById('video-preview');
+        const btnToggleFlash = document.getElementById('btn-toggle-flash');
+        const flashIcon = document.getElementById('flash-icon');
+        const scanStatus = document.getElementById('scan-status');
 
         let usuarioLogado = null;
         let codeReader = null;
-        let scanningActive = false;
+        let videoTrack = null;
+        let isFlashOn = false;
 
         // LÓGICA DO TEMA DIA / NOITE
         function inicializarTema() {
@@ -501,7 +511,7 @@
         // Logout
         btnLogout.addEventListener('click', (e) => {
             e.preventDefault();
-            pararLeitorCamera();
+            pararLeitorZXing();
             usuarioLogado = null;
             loginUser.value = "";
             loginPass.value = "";
@@ -510,6 +520,138 @@
             appScreen.classList.add('hidden');
             loginScreen.classList.remove('hidden');
             hideAlert();
+        });
+
+        // =======================================================
+        // INTEGRAÇÃO ZXING (ZEBRA CROSSING) PARA LEITURA DE EAN-13
+        // =======================================================
+        async function iniciarLeitorZXing() {
+            scannerContainer.classList.remove('hidden');
+            scanStatus.innerText = "Inicializando câmera...";
+            isFlashOn = false;
+            atualizarIconeFlash();
+
+            if (!codeReader) {
+                const hints = new Map();
+                // Define formatos suportados com foco prioritário em EAN-13
+                hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+                    ZXing.BarcodeFormat.EAN_13,
+                    ZXing.BarcodeFormat.EAN_8,
+                    ZXing.BarcodeFormat.CODE_128
+                ]);
+                codeReader = new ZXing.BrowserMultiFormatReader(hints);
+            }
+
+            try {
+                const videoInputDevices = await codeReader.listVideoInputDevices();
+                if (videoInputDevices.length === 0) {
+                    showAlert("Nenhuma câmera encontrada no dispositivo.", "warning");
+                    scannerContainer.classList.add('hidden');
+                    return;
+                }
+
+                // Prioriza câmera traseira (environment/rear/back)
+                let selectedDeviceId = videoInputDevices.find(device => 
+                    device.label.toLowerCase().includes('back') || 
+                    device.label.toLowerCase().includes('traseira') ||
+                    device.label.toLowerCase().includes('rear') ||
+                    device.label.toLowerCase().includes('environment')
+                )?.deviceId || videoInputDevices[videoInputDevices.length - 1].deviceId;
+
+                scanStatus.innerText = "Aponte para o código EAN-13...";
+
+                await codeReader.decodeFromVideoDevice(selectedDeviceId, 'video-preview', (result, err) => {
+                    if (result) {
+                        const eanLido = result.getText().trim();
+                        scanStatus.innerText = `Lido: ${eanLido}`;
+                        inputSearch.value = eanLido;
+                        selectCategoria.value = "";
+                        
+                        // Efeito sonoro/vibracional leve de confirmação se disponível
+                        if (navigator.vibrate) navigator.vibrate(100);
+
+                        pararLeitorZXing();
+                        executarConsulta(eanLido, '');
+                    }
+                    if (err && !(err instanceof ZXing.NotFoundException)) {
+                        console.error("ZXing Exception:", err);
+                    }
+                });
+
+                // Obter a track de vídeo atual para controle do Flash/Lanterna (WebKit/Safari e Android)
+                const videoElem = document.getElementById('video-preview');
+                if (videoElem && videoElem.srcObject) {
+                    const tracks = videoElem.srcObject.getVideoTracks();
+                    if (tracks.length > 0) {
+                        videoTrack = tracks[0];
+                    }
+                }
+
+            } catch (err) {
+                console.error("Erro ao iniciar leitor ZXing:", err);
+                showAlert("Erro ao acessar a câmera. Verifique as permissões do navegador.", "error");
+                scannerContainer.classList.add('hidden');
+            }
+        }
+
+        function pararLeitorZXing() {
+            if (codeReader) {
+                codeReader.reset();
+            }
+            if (videoTrack) {
+                if (isFlashOn) {
+                    try { videoTrack.applyConstraints({ advanced: [{ torch: false }] }); } catch (e) {}
+                }
+                videoTrack = null;
+            }
+            isFlashOn = false;
+            atualizarIconeFlash();
+            scannerContainer.classList.add('hidden');
+        }
+
+        async function alternarFlash() {
+            if (!videoTrack) return;
+
+            const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
+            if (!capabilities.torch) {
+                showAlert("Lanterna não suportada neste dispositivo/navegador.", "warning");
+                return;
+            }
+
+            try {
+                isFlashOn = !isFlashOn;
+                await videoTrack.applyConstraints({
+                    advanced: [{ torch: isFlashOn }]
+                });
+                atualizarIconeFlash();
+            } catch (err) {
+                console.error("Erro ao alternar lanterna:", err);
+            }
+        }
+
+        function atualizarIconeFlash() {
+            if (isFlashOn) {
+                flashIcon.className = "fa-solid fa-bolt-slash text-amber-400";
+                btnToggleFlash.classList.add('bg-amber-500/20', 'border-amber-400');
+            } else {
+                flashIcon.className = "fa-solid fa-bolt";
+                btnToggleFlash.classList.remove('bg-amber-500/20', 'border-amber-400');
+            }
+        }
+
+        btnOpenScanner.addEventListener('click', (e) => {
+            e.preventDefault();
+            iniciarLeitorZXing();
+        });
+
+        btnCloseScanner.addEventListener('click', (e) => {
+            e.preventDefault();
+            pararLeitorZXing();
+        });
+
+        btnToggleFlash.addEventListener('click', (e) => {
+            e.preventDefault();
+            alternarFlash();
         });
 
         // Carregar Categorias dinamicamente
@@ -543,66 +685,6 @@
             } catch (err) {
                 console.error("Erro ao carregar categorias:", err);
             }
-        }
-
-        // INTEGRAÇÃO ZXING - LEITOR DE CÂMERA AO VIVO
-        btnScanCamera.addEventListener('click', async (e) => {
-            e.preventDefault();
-            scannerContainer.classList.remove('hidden');
-            await iniciarLeitorCamera();
-        });
-
-        btnCloseScanner.addEventListener('click', (e) => {
-            e.preventDefault();
-            pararLeitorCamera();
-        });
-
-        async function iniciarLeitorCamera() {
-            if (scanningActive) return;
-            try {
-                if (!codeReader) {
-                    codeReader = new ZXingBrowser.BrowserMultiFormatReader();
-                }
-                scanningActive = true;
-                
-                const constraints = {
-                    video: {
-                        facingMode: { ideal: "environment" }
-                    }
-                };
-
-                await codeReader.decodeFromConstraints(constraints, videoPreview, (result, err) => {
-                    if (result) {
-                        const codigoLido = result.getText().trim();
-                        if (codigoLido) {
-                            pararLeitorCamera();
-                            inputSearch.value = codigoLido;
-                            selectCategoria.value = "";
-                            executarConsulta(codigoLido, '');
-                        }
-                    }
-                    if (err && !(err instanceof ZXingBrowser.NotFoundException)) {
-                        console.debug(err);
-                    }
-                });
-
-            } catch (err) {
-                console.error("Erro ao iniciar a câmera com ZXing:", err);
-                showAlert("Não foi possível acessar a câmera do dispositivo. Verifique as permissões do navegador.", "error");
-                pararLeitorCamera();
-            }
-        }
-
-        function pararLeitorCamera() {
-            scanningActive = false;
-            if (codeReader) {
-                try {
-                    codeReader.stop();
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-            scannerContainer.classList.add('hidden');
         }
 
         // Eventos de Busca e Filtro por Categoria
@@ -667,6 +749,7 @@
                     return isNaN(num) ? 0 : num;
                 }
 
+                // 1. Mapeia dados da tabela vendas para a loja do utilizador
                 registroVendas.data.forEach(v => {
                     const clienteVenda = v.cliente ? String(v.cliente).trim().toUpperCase() : '';
                     const nomeProduto = v.produto ? String(v.produto).trim().toUpperCase() : '';
@@ -705,6 +788,7 @@
                     }
                 });
 
+                // 2. Mapeia o estoque da loja correspondente (estoque negativo tratado como zero)
                 if (registroEstoque && registroEstoque.data) {
                     for (let k in registroEstoque.data) {
                         let item = registroEstoque.data[k];
